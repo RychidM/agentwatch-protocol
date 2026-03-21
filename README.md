@@ -78,4 +78,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Protocol changes must include updated ty
 
 ## License
 
-Apache 2.0
+GNU Affero General Public License v3.0
