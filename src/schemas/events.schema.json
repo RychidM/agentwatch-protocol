@@ -1,0 +1,207 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentwatch.dev/schemas/events.schema.json",
+  "title": "Events",
+  "description": "Event type definitions for the AgentWatch protocol.",
+  "definitions": {
+    "EventType": {
+      "$id": "#/definitions/EventType",
+      "type": "string",
+      "enum": [
+        "agent.registered",
+        "agent.started",
+        "agent.stopped",
+        "agent.heartbeat",
+        "agent.error",
+        "agent.log"
+      ],
+      "description": "Discriminant string literals for all event types."
+    },
+    "LogLevel": {
+      "$id": "#/definitions/LogLevel",
+      "type": "string",
+      "enum": ["debug", "info", "warn", "error"],
+      "description": "Severity levels for error and log events."
+    },
+    "BaseEvent": {
+      "$id": "#/definitions/BaseEvent",
+      "type": "object",
+      "description": "Common fields present on every event.",
+      "required": ["eventId", "type", "agentId", "occurredAt"],
+      "properties": {
+        "eventId": {
+          "$ref": "common.schema.json#/definitions/Uuid",
+          "description": "Unique event identifier."
+        },
+        "type": {
+          "$ref": "#/definitions/EventType",
+          "description": "Discriminant field that identifies the concrete event shape."
+        },
+        "agentId": {
+          "$ref": "common.schema.json#/definitions/Uuid",
+          "description": "Identifier of the agent that emitted the event."
+        },
+        "occurredAt": {
+          "$ref": "common.schema.json#/definitions/Timestamp",
+          "description": "ISO 8601 timestamp when the event occurred."
+        }
+      }
+    },
+    "AgentRegisteredEvent": {
+      "$id": "#/definitions/AgentRegisteredEvent",
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "description": "Emitted when an agent registers itself with the system for the first time.",
+          "required": ["type", "metadata"],
+          "additionalProperties": false,
+          "properties": {
+            "eventId": {},
+            "type": { "type": "string", "const": "agent.registered" },
+            "agentId": {},
+            "occurredAt": {},
+            "metadata": {
+              "$ref": "agent.schema.json#/definitions/AgentMetadata",
+              "description": "Metadata supplied by the agent at registration time."
+            }
+          }
+        }
+      ]
+    },
+    "AgentStartedEvent": {
+      "$id": "#/definitions/AgentStartedEvent",
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "description": "Emitted when an agent transitions to the \"active\" status.",
+          "required": ["type"],
+          "additionalProperties": false,
+          "properties": {
+            "eventId": {},
+            "type": { "type": "string", "const": "agent.started" },
+            "agentId": {},
+            "occurredAt": {}
+          }
+        }
+      ]
+    },
+    "AgentStoppedEvent": {
+      "$id": "#/definitions/AgentStoppedEvent",
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "description": "Emitted when an agent shuts down.",
+          "required": ["type"],
+          "additionalProperties": false,
+          "properties": {
+            "eventId": {},
+            "type": { "type": "string", "const": "agent.stopped" },
+            "agentId": {},
+            "occurredAt": {},
+            "reason": {
+              "type": "string",
+              "description": "Optional human-readable reason for the shutdown."
+            }
+          }
+        }
+      ]
+    },
+    "AgentHeartbeatEvent": {
+      "$id": "#/definitions/AgentHeartbeatEvent",
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "description": "Periodic liveness signal sent by a running agent.",
+          "required": ["type", "status"],
+          "additionalProperties": false,
+          "properties": {
+            "eventId": {},
+            "type": { "type": "string", "const": "agent.heartbeat" },
+            "agentId": {},
+            "occurredAt": {},
+            "status": {
+              "$ref": "agent.schema.json#/definitions/AgentStatus",
+              "description": "Current lifecycle status at the time of the heartbeat."
+            }
+          }
+        }
+      ]
+    },
+    "AgentErrorEvent": {
+      "$id": "#/definitions/AgentErrorEvent",
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "description": "Emitted when an agent encounters an unrecoverable or notable error.",
+          "required": ["type", "code", "message"],
+          "additionalProperties": false,
+          "properties": {
+            "eventId": {},
+            "type": { "type": "string", "const": "agent.error" },
+            "agentId": {},
+            "occurredAt": {},
+            "code": {
+              "type": "string",
+              "description": "Short error code or class name."
+            },
+            "message": {
+              "type": "string",
+              "description": "Human-readable error message."
+            },
+            "stack": {
+              "type": "string",
+              "description": "Optional serialised stack trace."
+            }
+          }
+        }
+      ]
+    },
+    "AgentLogEvent": {
+      "$id": "#/definitions/AgentLogEvent",
+      "allOf": [
+        { "$ref": "#/definitions/BaseEvent" },
+        {
+          "type": "object",
+          "description": "Emitted by an agent to forward a log entry to the observer.",
+          "required": ["type", "level", "message"],
+          "additionalProperties": false,
+          "properties": {
+            "eventId": {},
+            "type": { "type": "string", "const": "agent.log" },
+            "agentId": {},
+            "occurredAt": {},
+            "level": {
+              "$ref": "#/definitions/LogLevel",
+              "description": "Severity of the log entry."
+            },
+            "message": {
+              "type": "string",
+              "description": "Log message text."
+            },
+            "context": {
+              "type": "object",
+              "description": "Optional structured context data."
+            }
+          }
+        }
+      ]
+    },
+    "AgentEvent": {
+      "$id": "#/definitions/AgentEvent",
+      "description": "Discriminated union of all concrete event types.",
+      "oneOf": [
+        { "$ref": "#/definitions/AgentRegisteredEvent" },
+        { "$ref": "#/definitions/AgentStartedEvent" },
+        { "$ref": "#/definitions/AgentStoppedEvent" },
+        { "$ref": "#/definitions/AgentHeartbeatEvent" },
+        { "$ref": "#/definitions/AgentErrorEvent" },
+        { "$ref": "#/definitions/AgentLogEvent" }
+      ]
+    }
+  }
+}

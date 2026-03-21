@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentwatch.dev/schemas/common.schema.json",
+  "title": "Common",
+  "description": "Shared primitive type definitions used across the AgentWatch protocol.",
+  "definitions": {
+    "Timestamp": {
+      "$id": "#/definitions/Timestamp",
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime string (e.g. \"2026-03-21T11:00:00.000Z\")."
+    },
+    "Uuid": {
+      "$id": "#/definitions/Uuid",
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "description": "RFC 4122 UUID string."
+    },
+    "SemanticVersion": {
+      "$id": "#/definitions/SemanticVersion",
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$",
+      "description": "Semantic version string (e.g. \"1.0.0\")."
+    },
+    "ProtocolVersion": {
+      "$id": "#/definitions/ProtocolVersion",
+      "type": "string",
+      "const": "0.1.0",
+      "description": "Protocol version supported by this package."
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://agentwatch.dev/schemas/agent.schema.json",
+  "title": "Agent",
+  "description": "Agent-related type definitions for the AgentWatch protocol.",
+  "definitions": {
+    "AgentStatus": {
+      "$id": "#/definitions/AgentStatus",
+      "type": "string",
+      "enum": ["active", "idle", "error", "terminated"],
+      "description": "Possible lifecycle states of an agent."
+    },
+    "AgentCapability": {
+      "$id": "#/definitions/AgentCapability",
+      "type": "string",
+      "description": "A named capability that an agent supports (e.g. \"tool:search\")."
+    },
+    "AgentMetadata": {
+      "$id": "#/definitions/AgentMetadata",
+      "type": "object",
+      "description": "Descriptive metadata about an agent, supplied at registration time.",
+      "required": ["name", "version", "capabilities"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Human-readable display name."
+        },
+        "version": {
+          "$ref": "common.schema.json#/definitions/SemanticVersion",
+          "description": "Version of the agent software."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional description of the agent's purpose."
+        },
+        "capabilities": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/AgentCapability" },
+          "description": "List of capability identifiers the agent exposes."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Arbitrary key/value tags for filtering or grouping."
+        }
+      }
+    },
+    "AgentInfo": {
+      "$id": "#/definitions/AgentInfo",
+      "type": "object",
+      "description": "Full agent record combining its identifier, metadata, and current status.",
+      "required": ["id", "metadata", "status", "registeredAt", "updatedAt"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/definitions/Uuid",
+          "description": "Unique agent identifier."
+        },
+        "metadata": {
+          "$ref": "#/definitions/AgentMetadata",
+          "description": "Agent descriptive metadata."
+        },
+        "status": {
+          "$ref": "#/definitions/AgentStatus",
+          "description": "Current lifecycle status."
+        },
+        "registeredAt": {
+          "$ref": "common.schema.json#/definitions/Timestamp",
+          "description": "ISO 8601 timestamp when the agent was first registered."
+        },
+        "updatedAt": {
+          "$ref": "common.schema.json#/definitions/Timestamp",
+          "description": "ISO 8601 timestamp of the most recent status change."
+        }
+      }
+    }
+  }
+}
