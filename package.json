@@ -8,12 +8,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "./schemas/*": "./src/schemas/*"
+    }
   },
   "files": [
-    "dist",
-    "src/schemas"
+    "dist"
   ],
   "scripts": {
     "build": "tsc",
