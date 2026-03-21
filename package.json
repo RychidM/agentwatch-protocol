@@ -1,0 +1,32 @@
+{
+  "name": "@agentwatch/protocol",
+  "version": "0.1.0",
+  "description": "Type definitions and JSON schema validators for the AgentWatch protocol",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "tsc --noEmit"
+  },
+  "keywords": [
+    "agentwatch",
+    "protocol",
+    "types",
+    "schema"
+  ],
+  "author": "AgentWatch contributors",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
