@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "HookInput",
+  "description": "IDE stdin payload for hook script",
+  "additionalProperties": false,
+  "required": ["eventName", "sessionId", "cwd"],
+  "properties": {
+    "eventName": {
+      "type": "string",
+      "description": "Event being reported",
+      "enum": ["tool_call", "session_start", "session_end"]
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "Session ID",
+      "maxLength": 255
+    },
+    "cwd": {
+      "type": "string",
+      "description": "Current working directory",
+      "maxLength": 4096
+    },
+    "toolName": {
+      "type": "string",
+      "description": "Tool name for tool_call events",
+      "maxLength": 255
+    },
+    "toolInput": {
+      "type": "object",
+      "description": "Tool input parameters for tool_call events"
+    }
+  }
+}

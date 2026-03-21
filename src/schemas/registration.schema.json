@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "DeviceRegistration",
+  "description": "Phone app registration data",
+  "additionalProperties": false,
+  "required": ["deviceToken", "platform", "pairingId"],
+  "properties": {
+    "deviceToken": {
+      "type": "string",
+      "description": "FCM or APNs device token",
+      "maxLength": 1024
+    },
+    "platform": {
+      "type": "string",
+      "description": "Platform type",
+      "enum": ["ios", "android"]
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "Current session ID if registering during session",
+      "maxLength": 255
+    },
+    "pairingId": {
+      "type": "string",
+      "description": "Pairing ID for device linkage",
+      "maxLength": 255
+    }
+  }
+}

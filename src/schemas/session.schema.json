@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Session",
+  "description": "A single agent conversation",
+  "additionalProperties": false,
+  "required": ["id", "ide", "cwd", "startedAt", "status"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique session identifier",
+      "maxLength": 255
+    },
+    "ide": {
+      "type": "string",
+      "description": "IDE name",
+      "maxLength": 100
+    },
+    "cwd": {
+      "type": "string",
+      "description": "Current working directory",
+      "maxLength": 4096
+    },
+    "startedAt": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when session started",
+      "format": "date-time",
+      "maxLength": 64
+    },
+    "endedAt": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when session ended",
+      "format": "date-time",
+      "maxLength": 64
+    },
+    "status": {
+      "type": "string",
+      "description": "Current session status",
+      "enum": ["active", "completed", "failed", "cancelled"]
+    },
+    "pairingId": {
+      "type": "string",
+      "description": "Pairing ID if session is paired to a device",
+      "maxLength": 255
+    }
+  }
+}

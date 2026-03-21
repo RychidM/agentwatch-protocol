@@ -1,5 +1,5 @@
 {
-  "name": "@agentwatch/protocol",
+  "name": "@agent-watch/protocol",
   "version": "0.1.0",
   "description": "Type definitions and JSON schema validators for the AgentWatch protocol",
   "main": "dist/index.js",
@@ -26,7 +26,12 @@
   ],
   "author": "AgentWatch contributors",
   "license": "MIT",
+  "dependencies": {
+    "ajv": "^8.18.0",
+    "ajv-formats": "^3.0.1"
+  },
   "devDependencies": {
+    "@types/node": "^20.11.0",
     "typescript": "^5.4.5"
   }
 }

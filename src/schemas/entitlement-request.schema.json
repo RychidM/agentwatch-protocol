@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "EntitlementRequest",
+  "description": "Request to check user entitlement",
+  "additionalProperties": false,
+  "required": ["pairingId", "accountId", "actionType"],
+  "properties": {
+    "pairingId": {
+      "type": "string",
+      "description": "Pairing ID making the request",
+      "maxLength": 255
+    },
+    "accountId": {
+      "type": "string",
+      "description": "Account ID for the user",
+      "maxLength": 255
+    },
+    "actionType": {
+      "type": "string",
+      "description": "Action type being checked",
+      "maxLength": 255
+    }
+  }
+}

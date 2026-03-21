@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "ApprovalResponse",
+  "description": "User decision on approval request",
+  "additionalProperties": false,
+  "required": ["approvalId", "sessionId", "decision", "signature", "timestamp"],
+  "properties": {
+    "approvalId": {
+      "type": "string",
+      "description": "Approval request ID",
+      "maxLength": 255
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "Session ID",
+      "maxLength": 255
+    },
+    "decision": {
+      "type": "string",
+      "description": "User's decision",
+      "enum": ["allow", "deny"]
+    },
+    "signature": {
+      "type": "string",
+      "description": "HMAC signature for authenticity",
+      "maxLength": 512
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when decision was made",
+      "format": "date-time",
+      "maxLength": 64
+    }
+  }
+}

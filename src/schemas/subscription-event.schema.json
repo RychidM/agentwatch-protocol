@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "SubscriptionEvent",
+  "description": "FCM message for subscription limit events",
+  "additionalProperties": false,
+  "required": ["eventType"],
+  "properties": {
+    "eventType": {
+      "type": "string",
+      "description": "Type of subscription event",
+      "enum": ["limit_reached", "limit_warning", "plan_upgraded", "plan_downgraded"]
+    },
+    "limitType": {
+      "type": "string",
+      "description": "Limit type for limit events",
+      "enum": ["daily", "monthly"]
+    },
+    "count": {
+      "type": "integer",
+      "description": "Current count for limit events",
+      "minimum": 0
+    },
+    "limit": {
+      "type": "integer",
+      "description": "Limit value for limit events",
+      "minimum": 0
+    },
+    "resetDate": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when count resets",
+      "format": "date-time",
+      "maxLength": 64
+    },
+    "newPlan": {
+      "type": "string",
+      "description": "New plan for upgrade/downgrade events",
+      "enum": ["free", "pro", "enterprise"]
+    }
+  }
+}

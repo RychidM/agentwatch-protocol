@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "AgentAction",
+  "description": "A single agent tool call",
+  "additionalProperties": false,
+  "required": ["id", "sessionId", "toolName", "input", "summary", "tier", "timestamp"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique action identifier",
+      "maxLength": 255
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "Session this action belongs to",
+      "maxLength": 255
+    },
+    "toolName": {
+      "type": "string",
+      "description": "Tool name",
+      "maxLength": 255
+    },
+    "input": {
+      "type": "object",
+      "description": "Tool input parameters"
+    },
+    "summary": {
+      "type": "string",
+      "description": "Human-readable summary",
+      "maxLength": 2048
+    },
+    "tier": {
+      "type": "string",
+      "description": "Action tier",
+      "enum": ["read", "write", "run"]
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO 8601 timestamp when action was requested",
+      "format": "date-time",
+      "maxLength": 64
+    },
+    "outcome": {
+      "type": "string",
+      "description": "Action outcome",
+      "enum": ["allowed", "denied", "auto_approved"]
+    },
+    "autoApprovalRecord": {
+      "type": "object",
+      "description": "Auto-approval details",
+      "additionalProperties": false,
+      "required": ["reason", "limitType", "resetDate"],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "enum": ["limit_reached"]
+        },
+        "limitType": {
+          "type": "string",
+          "enum": ["daily", "monthly"]
+        },
+        "resetDate": {
+          "type": "string",
+          "format": "date-time",
+          "maxLength": 64
+        }
+      }
+    }
+  }
+}
