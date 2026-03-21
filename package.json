@@ -1,6 +1,6 @@
 {
   "name": "@agent-watch/protocol",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Type definitions and JSON schema validators for the AgentWatch protocol",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
