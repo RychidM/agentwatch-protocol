@@ -1,10 +1,16 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "registration.schema.json",
   "type": "object",
   "title": "DeviceRegistration",
   "description": "Phone app registration data",
   "additionalProperties": false,
-  "required": ["deviceToken", "platform", "pairingId"],
+  "required": [
+    "deviceToken",
+    "platform",
+    "sessionId",
+    "pairingId"
+  ],
   "properties": {
     "deviceToken": {
       "type": "string",
@@ -14,11 +20,14 @@
     "platform": {
       "type": "string",
       "description": "Platform type",
-      "enum": ["ios", "android"]
+      "enum": [
+        "ios",
+        "android"
+      ]
     },
     "sessionId": {
       "type": "string",
-      "description": "Current session ID if registering during session",
+      "description": "Session ID to subscribe to",
       "maxLength": 255
     },
     "pairingId": {

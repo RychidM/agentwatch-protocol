@@ -1,10 +1,17 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "session.schema.json",
   "type": "object",
   "title": "Session",
   "description": "A single agent conversation",
   "additionalProperties": false,
-  "required": ["id", "ide", "cwd", "startedAt", "status"],
+  "required": [
+    "id",
+    "ide",
+    "cwd",
+    "startedAt",
+    "status"
+  ],
   "properties": {
     "id": {
       "type": "string",
@@ -36,12 +43,11 @@
     "status": {
       "type": "string",
       "description": "Current session status",
-      "enum": ["active", "completed", "failed", "cancelled"]
-    },
-    "pairingId": {
-      "type": "string",
-      "description": "Pairing ID if session is paired to a device",
-      "maxLength": 255
+      "enum": [
+        "active",
+        "idle",
+        "ended"
+      ]
     }
   }
 }

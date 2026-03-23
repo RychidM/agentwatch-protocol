@@ -1,4 +1,4 @@
-# @agentwatch/protocol
+# @agent-watch/protocol
 
 Shared TypeScript type definitions and JSON schema validators for all AgentWatch components. This is the single source of truth for every message exchanged between the daemon, relay, and mobile apps.
 
@@ -15,9 +15,10 @@ This package defines every message type in the system. TypeScript components imp
 ## Installation
 
 ```bash
-npm install @agentwatch/protocol
+npm install @agent-watch/protocol
+# or
+yarn add @agent-watch/protocol
 ```
-
 ---
 
 ## Contents
@@ -39,17 +40,30 @@ npm install @agentwatch/protocol
 
 Every type ships with a runtime JSON schema validator. Use them to validate untrusted input at component boundaries.
 
-```typescript
-import { validateHookInput, validateApprovalResponse } from '@agentwatch/protocol';
+```ts
+import {
+  validateApprovalRequest,
+  validateActionResponse,
+} from "@agent-watch/protocol";
 
-const result = validateHookInput(JSON.parse(stdin));
-if (!result.valid) {
-  console.error(result.errors);
-  process.exit(0);
+const reqResult = validateApprovalRequest(input);
+if (!reqResult.success) {
+  console.error(reqResult.errors);
+}
+
+const actionResult = validateActionResponse({ status: "disconnected" });
+if (actionResult.success) {
+  console.log(actionResult.data.status);
 }
 ```
 
----
+Also available as grouped validators:
+
+```ts
+import { validate } from "@agent-watch/protocol";
+
+const result = validate.hookInput(parsed);
+```
 
 ## Versioning
 
@@ -79,3 +93,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). Protocol changes must include updated ty
 ## License
 
 GNU Affero General Public License v3.0
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [CHANGELOG.md](CHANGELOG.md).

@@ -1,0 +1,75 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "hook.schema.json",
+    "$defs": {
+        "HookInput": {
+            "type": "object",
+            "title": "HookInput",
+            "description": "IDE stdin payload for hook script",
+            "additionalProperties": false,
+            "required": [
+                "eventName",
+                "sessionId",
+                "cwd"
+            ],
+            "properties": {
+                "eventName": {
+                    "type": "string",
+                    "enum": [
+                        "SessionStart",
+                        "PreToolUse",
+                        "PostToolUse",
+                        "SessionEnd",
+                        "userPromptSubmitted",
+                        "before_tool"
+                    ]
+                },
+                "sessionId": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "cwd": {
+                    "type": "string",
+                    "maxLength": 4096
+                },
+                "toolName": {
+                    "type": "string",
+                    "maxLength": 255
+                },
+                "toolInput": {
+                    "type": "object"
+                },
+                "source": {
+                    "type": "string",
+                    "enum": [
+                        "startup",
+                        "resume",
+                        "clear"
+                    ]
+                }
+            }
+        },
+        "HookOutput": {
+            "type": "object",
+            "title": "HookOutput",
+            "description": "Hook response to IDE",
+            "additionalProperties": false,
+            "required": [
+                "decision"
+            ],
+            "properties": {
+                "decision": {
+                    "type": "string",
+                    "enum": [
+                        "allow",
+                        "deny"
+                    ]
+                },
+                "reason": {
+                    "type": "string",
+                    "maxLength": 2048
+                }
+            }
+        }
+    }
+}

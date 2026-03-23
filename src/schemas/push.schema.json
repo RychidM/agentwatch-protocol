@@ -1,30 +1,58 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "title": "PushPayload",
-  "description": "Relay envelope for encrypted messages",
-  "additionalProperties": false,
-  "required": ["type", "pairingId", "encryptedBlob"],
-  "properties": {
-    "type": {
-      "type": "string",
-      "description": "Type of payload",
-      "enum": ["approval_request", "session_start", "session_end", "subscription_event"]
+  "$id": "push.schema.json",
+  "$defs": {
+    "PushPayload": {
+      "type": "object",
+      "title": "PushPayload",
+      "description": "Relay envelope for encrypted messages",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "sessionId",
+        "pairingId",
+        "encryptedBlob"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "session_start",
+            "activity_update",
+            "approval_request",
+            "approval_sync",
+            "session_end"
+          ]
+        },
+        "sessionId": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "pairingId": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "encryptedBlob": {
+          "type": "string",
+          "maxLength": 1048576
+        }
+      }
     },
-    "sessionId": {
-      "type": "string",
-      "description": "Session ID if applicable",
-      "maxLength": 255
-    },
-    "pairingId": {
-      "type": "string",
-      "description": "Pairing ID for routing",
-      "maxLength": 255
-    },
-    "encryptedBlob": {
-      "type": "string",
-      "description": "Encrypted message blob (base64 encoded)",
-      "maxLength": 1048576
+    "ActionResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "pushed",
+            "disconnected"
+          ]
+        }
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@agent-watch/protocol",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Type definitions and JSON schema validators for the AgentWatch protocol",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,7 +16,7 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "tsc --noEmit"
+    "test": "npm run build && node --test test/**/*.test.cjs"
   },
   "keywords": [
     "agentwatch",

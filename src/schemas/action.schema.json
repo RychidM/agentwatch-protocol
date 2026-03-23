@@ -1,71 +1,86 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "title": "AgentAction",
-  "description": "A single agent tool call",
-  "additionalProperties": false,
-  "required": ["id", "sessionId", "toolName", "input", "summary", "tier", "timestamp"],
-  "properties": {
-    "id": {
-      "type": "string",
-      "description": "Unique action identifier",
-      "maxLength": 255
-    },
-    "sessionId": {
-      "type": "string",
-      "description": "Session this action belongs to",
-      "maxLength": 255
-    },
-    "toolName": {
-      "type": "string",
-      "description": "Tool name",
-      "maxLength": 255
-    },
-    "input": {
+  "$id": "action.schema.json",
+  "$defs": {
+    "AgentAction": {
       "type": "object",
-      "description": "Tool input parameters"
-    },
-    "summary": {
-      "type": "string",
-      "description": "Human-readable summary",
-      "maxLength": 2048
-    },
-    "tier": {
-      "type": "string",
-      "description": "Action tier",
-      "enum": ["read", "write", "run"]
-    },
-    "timestamp": {
-      "type": "string",
-      "description": "ISO 8601 timestamp when action was requested",
-      "format": "date-time",
-      "maxLength": 64
-    },
-    "outcome": {
-      "type": "string",
-      "description": "Action outcome",
-      "enum": ["allowed", "denied", "auto_approved"]
-    },
-    "autoApprovalRecord": {
-      "type": "object",
-      "description": "Auto-approval details",
+      "title": "AgentAction",
+      "description": "A single agent tool call",
       "additionalProperties": false,
-      "required": ["reason", "limitType", "resetDate"],
+      "required": [
+        "id",
+        "sessionId",
+        "toolName",
+        "input",
+        "summary",
+        "tier",
+        "hasNonAsciiWarning",
+        "timestamp"
+      ],
       "properties": {
-        "reason": {
+        "id": {
           "type": "string",
-          "enum": ["limit_reached"]
+          "maxLength": 255
         },
-        "limitType": {
+        "sessionId": {
           "type": "string",
-          "enum": ["daily", "monthly"]
+          "maxLength": 255
         },
-        "resetDate": {
+        "toolName": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "input": {
+          "type": "object"
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "tier": {
+          "type": "string",
+          "enum": [
+            "observe",
+            "approval"
+          ]
+        },
+        "hasNonAsciiWarning": {
+          "type": "boolean"
+        },
+        "timestamp": {
           "type": "string",
           "format": "date-time",
           "maxLength": 64
         }
       }
+    },
+    "ApprovalContextAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "toolName",
+        "summary"
+      ],
+      "properties": {
+        "toolName": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 2048
+        }
+      }
+    },
+    "ResolvedBy": {
+      "type": "string",
+      "enum": [
+        "phone",
+        "ide",
+        "ide_limit_fallback",
+        "ide_disconnected",
+        "timeout"
+      ]
     }
   }
 }
