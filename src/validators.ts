@@ -9,6 +9,7 @@ import addFormats from "ajv-formats";
 // Import all schemas
 import actionSchema from "./schemas/action.schema.json";
 import approvalSchema from "./schemas/approval.schema.json";
+import heartbeatSchema from "./schemas/heartbeat.schema.json";
 import hookSchema from "./schemas/hook.schema.json";
 import pushSchema from "./schemas/push.schema.json";
 import registrationSchema from "./schemas/registration.schema.json";
@@ -17,6 +18,7 @@ import sessionSchema from "./schemas/session.schema.json";
 // Import types
 import { AgentAction, ResolvedBy } from "./types/action";
 import { ApprovalRequest, ApprovalResponse } from "./types/approval";
+import { SessionHeartbeat } from "./types/heartbeat";
 import { HookInput, HookOutput } from "./types/hook";
 import { ActionResponse, PushPayload } from "./types/push";
 import { DeviceRegistration } from "./types/registration";
@@ -42,6 +44,7 @@ const ajv = new Ajv({
     sessionSchema,
     actionSchema,
     approvalSchema,
+    heartbeatSchema,
     pushSchema,
     registrationSchema,
     hookSchema,
@@ -76,6 +79,9 @@ const actionResponseValidator = ajv.compile(
 const registrationValidator = ajv.compile(
   registrationSchema,
 ) as ValidateFunction<DeviceRegistration>;
+const sessionHeartbeatValidator = ajv.compile(
+  heartbeatSchema,
+) as ValidateFunction<SessionHeartbeat>;
 const hookInputValidator = ajv.compile(
   getDef(hookSchema, "HookInput"),
 ) as ValidateFunction<HookInput>;
@@ -130,12 +136,16 @@ export const validateActionResponse = createValidator(actionResponseValidator);
 export const validateDeviceRegistration = createValidator(
   registrationValidator,
 );
+export const validateSessionHeartbeat = createValidator(
+  sessionHeartbeatValidator,
+);
 export const validateHookInput = createValidator(hookInputValidator);
 export const validateHookOutput = createValidator(hookOutputValidator);
 
 // Grouped export for ergonomic usage.
 export const validate = {
   session: validateSession,
+  sessionHeartbeat: validateSessionHeartbeat,
   sessionStatus: validateSessionStatus,
   agentAction: validateAgentAction,
   resolvedBy: validateResolvedBy,

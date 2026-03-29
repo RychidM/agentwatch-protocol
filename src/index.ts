@@ -8,6 +8,7 @@
 // Export all types
 export * from "./types/action";
 export * from "./types/approval";
+export * from "./types/heartbeat";
 export * from "./types/hook";
 export * from "./types/push";
 export * from "./types/registration";
@@ -27,5 +28,6 @@ export {
   validatePushPayload,
   validateResolvedBy,
   validateSession,
+  validateSessionHeartbeat,
   validateSessionStatus,
 } from "./validators";

@@ -11,6 +11,7 @@ const {
   validatePushPayload,
   validateActionResponse,
   validateDeviceRegistration,
+  validateSessionHeartbeat,
   validateHookInput,
   validateHookOutput,
 } = require("../dist/index.js");
@@ -195,4 +196,31 @@ test("validateHookInput rejects unknown eventName", () => {
 
 test("validateHookOutput rejects unknown decision", () => {
   assert.equal(validateHookOutput({ decision: "skip" }).success, false);
+});
+
+// --- SessionHeartbeat ---
+
+test("validateSessionHeartbeat accepts valid heartbeat", () => {
+  const result = validateSessionHeartbeat({ sessionId: "sess-001" });
+  assert.equal(result.success, true);
+});
+
+test("validateSessionHeartbeat rejects missing sessionId", () => {
+  const result = validateSessionHeartbeat({});
+  assert.equal(result.success, false);
+});
+
+test("validateSessionHeartbeat rejects empty sessionId", () => {
+  const result = validateSessionHeartbeat({ sessionId: "" });
+  assert.equal(result.success, false);
+});
+
+test("validateSessionHeartbeat rejects sessionId exceeding maxLength", () => {
+  const result = validateSessionHeartbeat({ sessionId: "a".repeat(129) });
+  assert.equal(result.success, false);
+});
+
+test("validateSessionHeartbeat rejects extra fields", () => {
+  const result = validateSessionHeartbeat({ sessionId: "sess-001", extra: "field" });
+  assert.equal(result.success, false);
 });
