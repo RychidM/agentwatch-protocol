@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "subscription-status.schema.json",
+  "type": "object",
+  "title": "SubscriptionStatus",
+  "description": "Current subscription status for a user",
+  "additionalProperties": false,
+  "required": [
+    "plan",
+    "approvalCount",
+    "approvalLimit",
+    "resetDate",
+    "deviceCount",
+    "featureFlags"
+  ],
+  "properties": {
+    "plan": {
+      "type": "string",
+      "enum": [
+        "free",
+        "pro",
+        "enterprise"
+      ]
+    },
+    "approvalCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "approvalLimit": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "resetDate": {
+      "type": "string",
+      "format": "date-time",
+      "maxLength": 64
+    },
+    "deviceCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "featureFlags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "unlimited_approvals",
+          "priority_support",
+          "custom_branding"
+        ]
+      }
+    }
+  }
+}

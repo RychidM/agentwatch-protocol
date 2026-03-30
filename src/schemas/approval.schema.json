@@ -1,89 +1,82 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "approval.schema.json",
-    "$defs": {
-        "ApprovalRequest": {
-            "type": "object",
-            "title": "ApprovalRequest",
-            "description": "Pending decision requiring user approval",
-            "additionalProperties": false,
-            "required": [
-                "approvalId",
-                "sessionId",
-                "action",
-                "precedingActions",
-                "timeoutMs",
-                "timestamp"
-            ],
-            "properties": {
-                "approvalId": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "sessionId": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "action": {
-                    "$ref": "action.schema.json#/$defs/AgentAction"
-                },
-                "precedingActions": {
-                    "type": "array",
-                    "maxItems": 3,
-                    "items": {
-                        "$ref": "action.schema.json#/$defs/ApprovalContextAction"
-                    }
-                },
-                "timeoutMs": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 300000
-                },
-                "timestamp": {
-                    "type": "string",
-                    "format": "date-time",
-                    "maxLength": 64
-                }
-            }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "approval.schema.json",
+  "$defs": {
+    "ApprovalRequest": {
+      "type": "object",
+      "title": "ApprovalRequest",
+      "description": "Pending decision requiring user approval",
+      "additionalProperties": false,
+      "required": [
+        "approvalId",
+        "sessionId",
+        "action",
+        "precedingActions",
+        "timeout"
+      ],
+      "properties": {
+        "approvalId": {
+          "type": "string",
+          "maxLength": 255
         },
-        "ApprovalResponse": {
-            "type": "object",
-            "title": "ApprovalResponse",
-            "description": "User decision on approval request",
-            "additionalProperties": false,
-            "required": [
-                "approvalId",
-                "sessionId",
-                "decision",
-                "signature",
-                "requestTimestamp"
-            ],
-            "properties": {
-                "approvalId": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "sessionId": {
-                    "type": "string",
-                    "maxLength": 255
-                },
-                "decision": {
-                    "type": "string",
-                    "enum": [
-                        "allow",
-                        "deny"
-                    ]
-                },
-                "signature": {
-                    "type": "string",
-                    "maxLength": 1024
-                },
-                "requestTimestamp": {
-                    "type": "string",
-                    "format": "date-time",
-                    "maxLength": 64
-                }
-            }
+        "sessionId": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "action": {
+          "$ref": "action.schema.json#/$defs/AgentAction"
+        },
+        "precedingActions": {
+          "type": "array",
+          "items": {
+            "$ref": "action.schema.json#/$defs/AgentAction"
+          }
+        },
+        "timeout": {
+          "type": "string",
+          "format": "date-time",
+          "maxLength": 64
         }
+      }
+    },
+    "ApprovalResponse": {
+      "type": "object",
+      "title": "ApprovalResponse",
+      "description": "User decision on approval request",
+      "additionalProperties": false,
+      "required": [
+        "approvalId",
+        "sessionId",
+        "decision",
+        "signature",
+        "timestamp"
+      ],
+      "properties": {
+        "approvalId": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "sessionId": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "deny"
+          ]
+        },
+        "signature": {
+          "type": "string",
+          "maxLength": 1024
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "maxLength": 64
+        }
+      }
     }
+  }
 }

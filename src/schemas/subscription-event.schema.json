@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "subscription-event.schema.json",
+  "type": "object",
+  "title": "SubscriptionEvent",
+  "description": "Subscription lifecycle event",
+  "additionalProperties": false,
+  "required": [
+    "eventType"
+  ],
+  "properties": {
+    "eventType": {
+      "type": "string",
+      "enum": [
+        "limit_reached",
+        "limit_warning",
+        "plan_upgraded",
+        "plan_downgraded"
+      ]
+    },
+    "limitType": {
+      "type": "string",
+      "enum": [
+        "daily",
+        "monthly"
+      ]
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "resetDate": {
+      "type": "string",
+      "format": "date-time",
+      "maxLength": 64
+    },
+    "newPlan": {
+      "type": "string",
+      "enum": [
+        "free",
+        "pro",
+        "enterprise"
+      ]
+    }
+  }
+}

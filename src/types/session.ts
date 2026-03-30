@@ -2,7 +2,7 @@
  * Session — A single agent conversation
  */
 
-export type SessionStatus = "active" | "idle" | "ended";
+export type SessionStatus = "active" | "completed" | "failed" | "cancelled";
 
 export interface Session {
   /** Unique session identifier */
@@ -22,4 +22,7 @@ export interface Session {
 
   /** Current session status */
   status: SessionStatus;
+
+  /** Pairing ID if session is paired to a device */
+  pairingId?: string;
 }

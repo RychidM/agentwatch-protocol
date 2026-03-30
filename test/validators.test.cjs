@@ -3,17 +3,17 @@ const assert = require("node:assert/strict");
 
 const {
   validateSession,
-  validateSessionStatus,
   validateAgentAction,
-  validateResolvedBy,
   validateApprovalRequest,
   validateApprovalResponse,
   validatePushPayload,
-  validateActionResponse,
   validateDeviceRegistration,
-  validateSessionHeartbeat,
   validateHookInput,
   validateHookOutput,
+  validateSubscriptionStatus,
+  validateEntitlementRequest,
+  validateEntitlementResponse,
+  validateSubscriptionEvent,
 } = require("../dist/index.js");
 
 const iso = "2026-03-23T10:00:00Z";
@@ -25,202 +25,419 @@ function baseAction() {
     toolName: "run_in_terminal",
     input: { command: "echo hello" },
     summary: "Echo hello to terminal",
-    tier: "approval",
-    hasNonAsciiWarning: false,
+    tier: "write",
     timestamp: iso,
   };
 }
+
+// --- Session ---
 
 test("validateSession accepts valid session", () => {
   const result = validateSession({
     id: "sess_1",
     ide: "vscode",
-    cwd: "/home/allfather/dev/backend/agentwatch/agentwatch-protocol",
+    cwd: "/home/user/project",
     startedAt: iso,
     status: "active",
   });
-
   assert.equal(result.success, true);
 });
 
-test("validateSession rejects invalid status", () => {
+test("validateSession accepts session with pairingId", () => {
+  const result = validateSession({
+    id: "sess_1",
+    ide: "cursor",
+    cwd: "/tmp",
+    startedAt: iso,
+    status: "completed",
+    pairingId: "pair_1",
+  });
+  assert.equal(result.success, true);
+});
+
+test("validateSession rejects old v1 status values", () => {
   const result = validateSession({
     id: "sess_1",
     ide: "vscode",
     cwd: "/tmp",
     startedAt: iso,
-    status: "completed",
+    status: "idle",
   });
-
   assert.equal(result.success, false);
 });
 
-test("validateAgentAction requires hasNonAsciiWarning", () => {
-  const action = baseAction();
-  delete action.hasNonAsciiWarning;
+test("validateSession accepts all v2 statuses", () => {
+  for (const status of ["active", "completed", "failed", "cancelled"]) {
+    const result = validateSession({
+      id: "sess_1",
+      ide: "vscode",
+      cwd: "/tmp",
+      startedAt: iso,
+      status,
+    });
+    assert.equal(result.success, true, `status "${status}" should be valid`);
+  }
+});
 
+// --- AgentAction ---
+
+test("validateAgentAction accepts valid action", () => {
+  const result = validateAgentAction(baseAction());
+  assert.equal(result.success, true);
+});
+
+test("validateAgentAction accepts action with outcome and autoApprovalRecord", () => {
+  const action = {
+    ...baseAction(),
+    outcome: "auto_approved",
+    autoApprovalRecord: {
+      reason: "limit_reached",
+      limitType: "daily",
+      resetDate: iso,
+    },
+  };
+  const result = validateAgentAction(action);
+  assert.equal(result.success, true);
+});
+
+test("validateAgentAction rejects old v1 tier values", () => {
+  const action = { ...baseAction(), tier: "approval" };
   const result = validateAgentAction(action);
   assert.equal(result.success, false);
 });
 
-test("validateResolvedBy accepts v1 enum values", () => {
-  const result = validateResolvedBy("ide_disconnected");
+test("validateAgentAction accepts all v2 tiers", () => {
+  for (const tier of ["read", "write", "run"]) {
+    const action = { ...baseAction(), tier };
+    const result = validateAgentAction(action);
+    assert.equal(result.success, true, `tier "${tier}" should be valid`);
+  }
+});
+
+test("validateAgentAction does not require hasNonAsciiWarning (v1 field removed)", () => {
+  const action = baseAction();
+  const result = validateAgentAction(action);
   assert.equal(result.success, true);
 });
 
-test("validateApprovalRequest enforces max preceding actions = 3", () => {
-  const request = {
+// --- ApprovalRequest ---
+
+test("validateApprovalRequest accepts valid request", () => {
+  const result = validateApprovalRequest({
     approvalId: "apr_1",
     sessionId: "sess_1",
     action: baseAction(),
-    precedingActions: [
-      { toolName: "read_file", summary: "Read config file" },
-      { toolName: "list_dir", summary: "List source directory" },
-      { toolName: "grep_search", summary: "Search for TODO comments" },
-      { toolName: "run_in_terminal", summary: "Run unit tests" },
-    ],
-    timeoutMs: 120000,
-    timestamp: iso,
-  };
+    precedingActions: [baseAction()],
+    timeout: iso,
+  });
+  assert.equal(result.success, true);
+});
 
-  const result = validateApprovalRequest(request);
+test("validateApprovalRequest uses timeout string instead of v1 timeoutMs", () => {
+  const result = validateApprovalRequest({
+    approvalId: "apr_1",
+    sessionId: "sess_1",
+    action: baseAction(),
+    precedingActions: [],
+    timeoutMs: 120000,
+  });
   assert.equal(result.success, false);
 });
 
-test("validateApprovalResponse requires requestTimestamp", () => {
+test("validateApprovalRequest precedingActions are full AgentAction objects", () => {
+  // v1 used ApprovalContextAction (toolName+summary only) — v2 uses full AgentAction
+  const result = validateApprovalRequest({
+    approvalId: "apr_1",
+    sessionId: "sess_1",
+    action: baseAction(),
+    precedingActions: [{ toolName: "read_file", summary: "Read config" }],
+    timeout: iso,
+  });
+  assert.equal(result.success, false);
+});
+
+// --- ApprovalResponse ---
+
+test("validateApprovalResponse accepts valid response", () => {
   const result = validateApprovalResponse({
     approvalId: "apr_1",
     sessionId: "sess_1",
     decision: "allow",
     signature: "hmac_signature_value",
-    requestTimestamp: iso,
+    timestamp: iso,
   });
-
   assert.equal(result.success, true);
 });
 
-test("validatePushPayload accepts activity_update type", () => {
+test("validateApprovalResponse uses timestamp instead of v1 requestTimestamp", () => {
+  const result = validateApprovalResponse({
+    approvalId: "apr_1",
+    sessionId: "sess_1",
+    decision: "allow",
+    signature: "hmac_value",
+    requestTimestamp: iso,
+  });
+  assert.equal(result.success, false);
+});
+
+// --- PushPayload ---
+
+test("validatePushPayload accepts valid payload", () => {
   const result = validatePushPayload({
-    type: "activity_update",
+    type: "approval_request",
+    pairingId: "pair_1",
+    encryptedBlob: "aGVsbG8=",
+  });
+  assert.equal(result.success, true);
+});
+
+test("validatePushPayload accepts subscription_event type", () => {
+  const result = validatePushPayload({
+    type: "subscription_event",
+    pairingId: "pair_1",
+    encryptedBlob: "aGVsbG8=",
+  });
+  assert.equal(result.success, true);
+});
+
+test("validatePushPayload sessionId is optional", () => {
+  const result = validatePushPayload({
+    type: "session_start",
     sessionId: "sess_1",
     pairingId: "pair_1",
     encryptedBlob: "aGVsbG8=",
   });
-
   assert.equal(result.success, true);
 });
 
-test("validateActionResponse accepts disconnected status", () => {
-  const result = validateActionResponse({ status: "disconnected" });
-  assert.equal(result.success, true);
+test("validatePushPayload rejects old v1 types", () => {
+  const result = validatePushPayload({
+    type: "activity_update",
+    pairingId: "pair_1",
+    encryptedBlob: "aGVsbG8=",
+  });
+  assert.equal(result.success, false);
 });
 
-test("validateDeviceRegistration requires sessionId", () => {
+// --- DeviceRegistration ---
+
+test("validateDeviceRegistration accepts valid registration", () => {
   const result = validateDeviceRegistration({
     deviceToken: "device_token_123",
     platform: "ios",
     pairingId: "pair_1",
   });
-
-  assert.equal(result.success, false);
+  assert.equal(result.success, true);
 });
 
-test("validateHookInput accepts SessionStart with source", () => {
+test("validateDeviceRegistration sessionId is optional", () => {
+  const result = validateDeviceRegistration({
+    deviceToken: "device_token_123",
+    platform: "android",
+    sessionId: "sess_1",
+    pairingId: "pair_1",
+  });
+  assert.equal(result.success, true);
+});
+
+// --- HookInput ---
+
+test("validateHookInput accepts tool_call event", () => {
+  const result = validateHookInput({
+    eventName: "tool_call",
+    sessionId: "sess_1",
+    cwd: "/tmp",
+    toolName: "read_file",
+    toolInput: { path: "/etc/hosts" },
+  });
+  assert.equal(result.success, true);
+});
+
+test("validateHookInput accepts session_start event", () => {
+  const result = validateHookInput({
+    eventName: "session_start",
+    sessionId: "sess_1",
+    cwd: "/tmp",
+  });
+  assert.equal(result.success, true);
+});
+
+test("validateHookInput rejects old v1 event names", () => {
   const result = validateHookInput({
     eventName: "SessionStart",
     sessionId: "sess_1",
     cwd: "/tmp",
+  });
+  assert.equal(result.success, false);
+});
+
+test("validateHookInput rejects source field (v1 removed)", () => {
+  const result = validateHookInput({
+    eventName: "session_start",
+    sessionId: "sess_1",
+    cwd: "/tmp",
     source: "startup",
   });
-
-  assert.equal(result.success, true);
+  assert.equal(result.success, false);
 });
+
+// --- HookOutput ---
 
 test("validateHookOutput accepts deny with reason", () => {
   const result = validateHookOutput({
     decision: "deny",
     reason: "User denied this action",
   });
-
   assert.equal(result.success, true);
-});
-
-// --- SessionStatus ---
-
-test("validateSessionStatus accepts active", () => {
-  assert.equal(validateSessionStatus("active").success, true);
-});
-
-test("validateSessionStatus rejects unknown status", () => {
-  assert.equal(validateSessionStatus("completed").success, false);
-});
-
-// --- Rejection paths for validators tested only positively above ---
-
-test("validateResolvedBy rejects unknown value", () => {
-  assert.equal(validateResolvedBy("always_allow").success, false);
-});
-
-test("validateApprovalResponse rejects missing requestTimestamp", () => {
-  const result = validateApprovalResponse({
-    approvalId: "apr_1",
-    sessionId: "sess_1",
-    decision: "allow",
-    signature: "hmac_value",
-  });
-  assert.equal(result.success, false);
-});
-
-test("validatePushPayload rejects unknown type", () => {
-  const result = validatePushPayload({
-    type: "unknown_event",
-    sessionId: "sess_1",
-    pairingId: "pair_1",
-    encryptedBlob: "aGVsbG8=",
-  });
-  assert.equal(result.success, false);
-});
-
-test("validateActionResponse rejects unknown status", () => {
-  assert.equal(validateActionResponse({ status: "pending" }).success, false);
-});
-
-test("validateHookInput rejects unknown eventName", () => {
-  const result = validateHookInput({
-    eventName: "ToolCall",
-    sessionId: "sess_1",
-    cwd: "/tmp",
-  });
-  assert.equal(result.success, false);
 });
 
 test("validateHookOutput rejects unknown decision", () => {
   assert.equal(validateHookOutput({ decision: "skip" }).success, false);
 });
 
-// --- SessionHeartbeat ---
+// --- SubscriptionStatus ---
 
-test("validateSessionHeartbeat accepts valid heartbeat", () => {
-  const result = validateSessionHeartbeat({ sessionId: "sess-001" });
+test("validateSubscriptionStatus accepts valid status", () => {
+  const result = validateSubscriptionStatus({
+    plan: "pro",
+    approvalCount: 42,
+    approvalLimit: 100,
+    resetDate: iso,
+    deviceCount: 2,
+    featureFlags: ["unlimited_approvals"],
+  });
   assert.equal(result.success, true);
 });
 
-test("validateSessionHeartbeat rejects missing sessionId", () => {
-  const result = validateSessionHeartbeat({});
+test("validateSubscriptionStatus accepts null approvalLimit (unlimited)", () => {
+  const result = validateSubscriptionStatus({
+    plan: "enterprise",
+    approvalCount: 0,
+    approvalLimit: null,
+    resetDate: iso,
+    deviceCount: 5,
+    featureFlags: ["unlimited_approvals", "priority_support", "custom_branding"],
+  });
+  assert.equal(result.success, true);
+});
+
+test("validateSubscriptionStatus rejects invalid plan", () => {
+  const result = validateSubscriptionStatus({
+    plan: "premium",
+    approvalCount: 0,
+    approvalLimit: 10,
+    resetDate: iso,
+    deviceCount: 1,
+    featureFlags: [],
+  });
   assert.equal(result.success, false);
 });
 
-test("validateSessionHeartbeat rejects empty sessionId", () => {
-  const result = validateSessionHeartbeat({ sessionId: "" });
+test("validateSubscriptionStatus rejects invalid featureFlag", () => {
+  const result = validateSubscriptionStatus({
+    plan: "free",
+    approvalCount: 0,
+    approvalLimit: 10,
+    resetDate: iso,
+    deviceCount: 1,
+    featureFlags: ["invalid_flag"],
+  });
   assert.equal(result.success, false);
 });
 
-test("validateSessionHeartbeat rejects sessionId exceeding maxLength", () => {
-  const result = validateSessionHeartbeat({ sessionId: "a".repeat(129) });
+// --- EntitlementRequest ---
+
+test("validateEntitlementRequest accepts valid request", () => {
+  const result = validateEntitlementRequest({
+    pairingId: "pair_1",
+    accountId: "acct_123",
+    actionType: "approval",
+  });
+  assert.equal(result.success, true);
+});
+
+test("validateEntitlementRequest rejects missing accountId", () => {
+  const result = validateEntitlementRequest({
+    pairingId: "pair_1",
+    actionType: "approval",
+  });
   assert.equal(result.success, false);
 });
 
-test("validateSessionHeartbeat rejects extra fields", () => {
-  const result = validateSessionHeartbeat({ sessionId: "sess-001", extra: "field" });
+// --- EntitlementResponse ---
+
+test("validateEntitlementResponse accepts allowed response", () => {
+  const result = validateEntitlementResponse({
+    decision: "allowed",
+    count: 5,
+    limit: 100,
+    resetDate: iso,
+  });
+  assert.equal(result.success, true);
+});
+
+test("validateEntitlementResponse accepts denied with errorCode", () => {
+  const result = validateEntitlementResponse({
+    decision: "denied",
+    errorCode: "limit_exceeded",
+    count: 100,
+    limit: 100,
+    resetDate: iso,
+  });
+  assert.equal(result.success, true);
+});
+
+test("validateEntitlementResponse accepts null limit (unlimited)", () => {
+  const result = validateEntitlementResponse({
+    decision: "allowed",
+    count: 0,
+    limit: null,
+    resetDate: iso,
+  });
+  assert.equal(result.success, true);
+});
+
+test("validateEntitlementResponse rejects invalid decision", () => {
+  const result = validateEntitlementResponse({
+    decision: "maybe",
+    count: 0,
+    limit: 10,
+    resetDate: iso,
+  });
   assert.equal(result.success, false);
+});
+
+// --- SubscriptionEvent ---
+
+test("validateSubscriptionEvent accepts limit_reached event", () => {
+  const result = validateSubscriptionEvent({
+    eventType: "limit_reached",
+    limitType: "daily",
+    count: 50,
+    limit: 50,
+    resetDate: iso,
+  });
+  assert.equal(result.success, true);
+});
+
+test("validateSubscriptionEvent accepts plan_upgraded event", () => {
+  const result = validateSubscriptionEvent({
+    eventType: "plan_upgraded",
+    newPlan: "pro",
+  });
+  assert.equal(result.success, true);
+});
+
+test("validateSubscriptionEvent rejects invalid eventType", () => {
+  const result = validateSubscriptionEvent({
+    eventType: "subscription_cancelled",
+  });
+  assert.equal(result.success, false);
+});
+
+test("validateSubscriptionEvent only requires eventType", () => {
+  const result = validateSubscriptionEvent({
+    eventType: "limit_warning",
+  });
+  assert.equal(result.success, true);
 });

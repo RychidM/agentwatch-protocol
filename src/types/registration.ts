@@ -11,8 +11,8 @@ export interface DeviceRegistration {
   /** Platform type */
   platform: DevicePlatform;
 
-  /** Session ID to subscribe to. */
-  sessionId: string;
+  /** Current session ID (if registering during session) */
+  sessionId?: string;
 
   /** Pairing ID for device linkage */
   pairingId: string;

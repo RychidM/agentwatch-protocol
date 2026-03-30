@@ -45,9 +45,15 @@
       "description": "Current session status",
       "enum": [
         "active",
-        "idle",
-        "ended"
+        "completed",
+        "failed",
+        "cancelled"
       ]
+    },
+    "pairingId": {
+      "type": "string",
+      "description": "Pairing ID if session is paired to a device",
+      "maxLength": 255
     }
   }
 }

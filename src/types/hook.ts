@@ -2,15 +2,7 @@
  * HookInput and HookOutput — IDE stdin/stdout payloads for hook script
  */
 
-export type HookEventName =
-  | "SessionStart"
-  | "PreToolUse"
-  | "PostToolUse"
-  | "SessionEnd"
-  | "userPromptSubmitted"
-  | "before_tool";
-
-export type HookSource = "startup" | "resume" | "clear";
+export type HookEventName = "tool_call" | "session_start" | "session_end";
 
 export interface HookInput {
   /** Event being reported */
@@ -27,9 +19,6 @@ export interface HookInput {
 
   /** Tool input parameters (for tool_call events) */
   toolInput?: Record<string, unknown>;
-
-  /** Source of SessionStart events. */
-  source?: HookSource;
 }
 
 export type HookDecision = "allow" | "deny";

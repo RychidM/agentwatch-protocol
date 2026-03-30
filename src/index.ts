@@ -8,26 +8,26 @@
 // Export all types
 export * from "./types/action";
 export * from "./types/approval";
-export * from "./types/heartbeat";
 export * from "./types/hook";
 export * from "./types/push";
 export * from "./types/registration";
 export * from "./types/session";
+export * from "./types/subscription";
 
 // Export validators
 export {
   ValidationResult,
   validate,
-  validateActionResponse,
   validateAgentAction,
   validateApprovalRequest,
   validateApprovalResponse,
   validateDeviceRegistration,
+  validateEntitlementRequest,
+  validateEntitlementResponse,
   validateHookInput,
   validateHookOutput,
   validatePushPayload,
-  validateResolvedBy,
   validateSession,
-  validateSessionHeartbeat,
-  validateSessionStatus,
+  validateSubscriptionEvent,
+  validateSubscriptionStatus,
 } from "./validators";

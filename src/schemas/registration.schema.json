@@ -8,7 +8,6 @@
   "required": [
     "deviceToken",
     "platform",
-    "sessionId",
     "pairingId"
   ],
   "properties": {
@@ -27,7 +26,7 @@
     },
     "sessionId": {
       "type": "string",
-      "description": "Session ID to subscribe to",
+      "description": "Current session ID (if registering during session)",
       "maxLength": 255
     },
     "pairingId": {

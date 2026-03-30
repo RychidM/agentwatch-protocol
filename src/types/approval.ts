@@ -2,7 +2,7 @@
  * ApprovalRequest and ApprovalResponse — Pending decision and user response
  */
 
-import { AgentAction, ApprovalContextAction } from "./action";
+import { AgentAction } from "./action";
 
 export interface ApprovalRequest {
   /** Unique approval request identifier */
@@ -14,14 +14,11 @@ export interface ApprovalRequest {
   /** The action requiring approval */
   action: AgentAction;
 
-  /** Last three actions for context (tool name + summary only). */
-  precedingActions: ApprovalContextAction[];
+  /** Previous actions in this session for context */
+  precedingActions: AgentAction[];
 
-  /** Time-to-live for this request in milliseconds. */
-  timeoutMs: number;
-
-  /** ISO 8601 timestamp when the request was created. */
-  timestamp: string;
+  /** ISO 8601 timestamp when request expires */
+  timeout: string;
 }
 
 export type ApprovalDecision = "allow" | "deny";
@@ -39,6 +36,6 @@ export interface ApprovalResponse {
   /** HMAC signature for authenticity verification */
   signature: string;
 
-  /** Original request timestamp for stale detection. */
-  requestTimestamp: string;
+  /** ISO 8601 timestamp when decision was made */
+  timestamp: string;
 }

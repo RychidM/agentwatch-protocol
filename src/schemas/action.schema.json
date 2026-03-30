@@ -14,7 +14,6 @@
         "input",
         "summary",
         "tier",
-        "hasNonAsciiWarning",
         "timestamp"
       ],
       "properties": {
@@ -40,47 +39,54 @@
         "tier": {
           "type": "string",
           "enum": [
-            "observe",
-            "approval"
+            "read",
+            "write",
+            "run"
           ]
-        },
-        "hasNonAsciiWarning": {
-          "type": "boolean"
         },
         "timestamp": {
           "type": "string",
           "format": "date-time",
           "maxLength": 64
-        }
-      }
-    },
-    "ApprovalContextAction": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "toolName",
-        "summary"
-      ],
-      "properties": {
-        "toolName": {
-          "type": "string",
-          "maxLength": 255
         },
-        "summary": {
+        "outcome": {
           "type": "string",
-          "maxLength": 2048
+          "enum": [
+            "allowed",
+            "denied",
+            "auto_approved"
+          ]
+        },
+        "autoApprovalRecord": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "reason",
+            "limitType",
+            "resetDate"
+          ],
+          "properties": {
+            "reason": {
+              "type": "string",
+              "enum": [
+                "limit_reached"
+              ]
+            },
+            "limitType": {
+              "type": "string",
+              "enum": [
+                "daily",
+                "monthly"
+              ]
+            },
+            "resetDate": {
+              "type": "string",
+              "format": "date-time",
+              "maxLength": 64
+            }
+          }
         }
       }
-    },
-    "ResolvedBy": {
-      "type": "string",
-      "enum": [
-        "phone",
-        "ide",
-        "ide_limit_fallback",
-        "ide_disconnected",
-        "timeout"
-      ]
     }
   }
 }

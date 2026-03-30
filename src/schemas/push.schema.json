@@ -9,7 +9,6 @@
       "additionalProperties": false,
       "required": [
         "type",
-        "sessionId",
         "pairingId",
         "encryptedBlob"
       ],
@@ -17,11 +16,10 @@
         "type": {
           "type": "string",
           "enum": [
-            "session_start",
-            "activity_update",
             "approval_request",
-            "approval_sync",
-            "session_end"
+            "session_start",
+            "session_end",
+            "subscription_event"
           ]
         },
         "sessionId": {
@@ -35,22 +33,6 @@
         "encryptedBlob": {
           "type": "string",
           "maxLength": 1048576
-        }
-      }
-    },
-    "ActionResponse": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "status"
-      ],
-      "properties": {
-        "status": {
-          "type": "string",
-          "enum": [
-            "pushed",
-            "disconnected"
-          ]
         }
       }
     }

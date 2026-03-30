@@ -2,21 +2,18 @@
  * AgentAction — A single agent tool call
  */
 
-export type ActionTier = "observe" | "approval";
+export type ActionTier = "read" | "write" | "run";
+export type ActionOutcome = "allowed" | "denied" | "auto_approved";
 
-export type ResolvedBy =
-  | "phone"
-  | "ide"
-  | "ide_limit_fallback"
-  | "ide_disconnected"
-  | "timeout";
+export interface AutoApprovalRecord {
+  /** Reason for auto-approval */
+  reason: "limit_reached";
 
-export interface ApprovalContextAction {
-  /** Previous action tool name shown for context. */
-  toolName: string;
+  /** Type of limit that was reached */
+  limitType: "daily" | "monthly";
 
-  /** Previous action summary shown for context. */
-  summary: string;
+  /** ISO 8601 timestamp when the limit resets */
+  resetDate: string;
 }
 
 export interface AgentAction {
@@ -35,12 +32,15 @@ export interface AgentAction {
   /** Human-readable summary of the action */
   summary: string;
 
-  /** Action tier (observe/approval). */
+  /** Action tier (read/write/run) */
   tier: ActionTier;
-
-  /** True when daemon sanitization detected non-ASCII content in args. */
-  hasNonAsciiWarning: boolean;
 
   /** ISO 8601 timestamp when action was requested */
   timestamp: string;
+
+  /** Action outcome - how it was resolved */
+  outcome?: ActionOutcome;
+
+  /** Auto-approval details if outcome is auto_approved */
+  autoApprovalRecord?: AutoApprovalRecord;
 }
