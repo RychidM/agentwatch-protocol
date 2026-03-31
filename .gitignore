@@ -3,3 +3,5 @@ dist/
 *.tsbuildinfo
 .claude/
 .vscode/
+v2.ts
+validators-v2.ts

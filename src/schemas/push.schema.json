@@ -18,8 +18,7 @@
           "enum": [
             "approval_request",
             "session_start",
-            "session_end",
-            "subscription_event"
+            "session_end"
           ]
         },
         "sessionId": {

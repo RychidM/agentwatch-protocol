@@ -10,11 +10,14 @@ const {
   validateDeviceRegistration,
   validateHookInput,
   validateHookOutput,
+} = require("../dist/index.js");
+
+const {
   validateSubscriptionStatus,
   validateEntitlementRequest,
   validateEntitlementResponse,
   validateSubscriptionEvent,
-} = require("../dist/index.js");
+} = require("../dist/v2.js");
 
 const iso = "2026-03-23T10:00:00Z";
 
@@ -164,18 +167,18 @@ test("validateApprovalResponse accepts valid response", () => {
     sessionId: "sess_1",
     decision: "allow",
     signature: "hmac_signature_value",
-    timestamp: iso,
+    requestTimestamp: iso,
   });
   assert.equal(result.success, true);
 });
 
-test("validateApprovalResponse uses timestamp instead of v1 requestTimestamp", () => {
+test("validateApprovalResponse rejects old v1 timestamp field name", () => {
   const result = validateApprovalResponse({
     approvalId: "apr_1",
     sessionId: "sess_1",
     decision: "allow",
     signature: "hmac_value",
-    requestTimestamp: iso,
+    timestamp: iso,
   });
   assert.equal(result.success, false);
 });
@@ -191,13 +194,13 @@ test("validatePushPayload accepts valid payload", () => {
   assert.equal(result.success, true);
 });
 
-test("validatePushPayload accepts subscription_event type", () => {
+test("validatePushPayload rejects v2 subscription_event type", () => {
   const result = validatePushPayload({
     type: "subscription_event",
     pairingId: "pair_1",
     encryptedBlob: "aGVsbG8=",
   });
-  assert.equal(result.success, true);
+  assert.equal(result.success, false);
 });
 
 test("validatePushPayload sessionId is optional", () => {

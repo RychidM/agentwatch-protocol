@@ -37,5 +37,5 @@ export interface ApprovalResponse {
   signature: string;
 
   /** ISO 8601 timestamp when decision was made */
-  timestamp: string;
+  requestTimestamp: string;
 }

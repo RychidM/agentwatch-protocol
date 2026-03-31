@@ -5,8 +5,7 @@
 export type PushPayloadType =
   | "approval_request"
   | "session_start"
-  | "session_end"
-  | "subscription_event";
+  | "session_end";
 
 export interface PushPayload {
   /** Type of payload being sent */
